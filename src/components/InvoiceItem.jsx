@@ -8,9 +8,10 @@ import { useSelector } from "react-redux";
 import { useProductListData } from "../redux/hooks";
 
 const InvoiceItem = (props) => {
-  const { onItemizedItemEdit, currency, onRowDel, items, onRowAdd } = props;
+  const { onItemizedItemEdit, currency, onRowDel, items, onRowAdd,editField } = props;
 
   const { productList } = useProductListData();  
+  console.log("product lis",productList)
   const itemTable = items.map((item) => (
     <ItemRow
       key={item.id}
@@ -19,6 +20,7 @@ const InvoiceItem = (props) => {
       onDelEvent={onRowDel}
       onItemizedItemEdit={onItemizedItemEdit}
       currency={currency}
+      editField={editField}
     />
   ));
 
@@ -43,23 +45,38 @@ const InvoiceItem = (props) => {
 };
 
 const ItemRow = (props) => {
-  const { productList, item, onItemizedItemEdit, currency } = props;
+  const { productList, item, onItemizedItemEdit, currency,editField } = props;
 
-  console.log("---productlsit",productList)
+  console.log("---productlsit",productList);
+
   const onProductSelect = (event) => {
     const selectedProduct = productList.find(
-      (product) => product._id === event.target.value
+      (product) => product.id === event.target.value
     );
 
     if (selectedProduct) {
       onItemizedItemEdit(
-        { target: { name: "itemName", value: selectedProduct.title } },
+        { target: 
+          { 
+            // name: "itemName",
+            itemName:selectedProduct.title,
+            itemPrice:selectedProduct.price,
+            value: selectedProduct.title } },
+        item.itemId
+      );
+     
+      
+    }else {
+      // If no product is selected or invalid ID
+      onItemizedItemEdit(
+        { target: { name: "itemName", value: "" } },
         item.itemId
       );
       onItemizedItemEdit(
-        { target: { name: "itemPrice", value: selectedProduct.price } },
+        { target: { name: "itemPrice", value: "" } },
         item.itemId
       );
+      
     }
   };
 
@@ -72,13 +89,14 @@ const ItemRow = (props) => {
       <td style={{ width: "100%" }}>
         <select
           className="form-select"
-          value={item.itemName}
+          value={item.itemId}
           onChange={onProductSelect}
+          style={{ color:"black" }}
         >
           <option value="">Select a product</option>
           {productList.map((product) => (
-            <option key={product._id} value={product._id}>
-              {product.title}
+            <option key={product.itemId} value={product.itemId} style={{color:"black"}}>
+             {product.title}
             </option>
           ))}
         </select>
@@ -111,7 +129,6 @@ const ItemRow = (props) => {
           onItemizedItemEdit={(evt) => onItemizedItemEdit(evt, item.itemId)}
           cellData={{
             leading: currency,
-            type: "number",
             name: "itemPrice",
             min: 1,
             step: "0.01",

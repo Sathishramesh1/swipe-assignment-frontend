@@ -27,6 +27,9 @@ console.log("-----product list",productList)
             <Link to="/addProduct">
               <Button variant="primary mb-2 mb-md-4">Create Product</Button>
             </Link>
+            <Link to="/">
+              <Button variant="primary mb-2 mb-md-4">Go to Invoice</Button>
+            </Link>
             <div className="d-flex gap-2">
               {/* Add functionality for Copying if needed */}
               <Button variant="dark mb-2 mb-md-4">

@@ -23,7 +23,7 @@ export const useInvoiceListData = () => {
 };
 
 export const useProductListData = () => {
-  const productList = useSelector(selectProductList) || [];
+  const productList = useSelector(selectProductList) 
 
   const getOneProduct = (receivedId) => {
     return (

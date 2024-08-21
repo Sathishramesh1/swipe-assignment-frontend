@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addInvoice, updateInvoice } from "../redux/invoicesSlice";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import generateRandomId from "../utils/generateRandomId";
-import { useInvoiceListData } from "../redux/hooks";
+import { useInvoiceListData, useProductListData } from "../redux/hooks";
 
 const InvoiceForm = () => {
   const dispatch = useDispatch();
@@ -28,7 +28,9 @@ const InvoiceForm = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [copyId, setCopyId] = useState("");
-  const { getOneInvoice, listSize } = useInvoiceListData();
+  const { getOneInvoice, listSize } = useInvoiceListData(); 
+  const { productList } = useProductListData();  
+
   const [formData, setFormData] = useState(
     isEdit
       ? getOneInvoice(params.id)
@@ -129,15 +131,40 @@ const InvoiceForm = () => {
   };
 
   const onItemizedItemEdit = (evt, id) => {
-    const updatedItems = formData.items.map((oldItem) => {
-      if (oldItem.itemId === id) {
-        return { ...oldItem, [evt.target.name]: evt.target.value };
-      }
-      return oldItem;
-    });
+    // const updatedItems = formData.items.map((oldItem) => {
+    //   if (oldItem.itemId === id) {
+    //     return { ...oldItem, [evt.target.name]: evt.target.value };
+    //   }
+    //   return oldItem;
+    // });
 
-    setFormData({ ...formData, items: updatedItems });
-    handleCalculateTotal();
+    // setFormData({ ...formData, items: updatedItems });
+    // handleCalculateTotal();
+    const { name, value } = evt.target;
+console.log("item",name,value)
+  const updatedItems = formData.items.map((oldItem) => {
+    if (oldItem.itemId === id) {
+     
+      if (name === 'itemName') {
+        const selectedProduct = productList.find(product => product.title === value);
+        console.log("final testing",selectedProduct)
+        return {
+          ...oldItem,
+          itemName: value,
+          itemPrice: selectedProduct ? selectedProduct.price : oldItem.itemPrice,
+        };
+      }
+     
+      return {
+        ...oldItem,
+        [name]: value,
+      };
+    }
+    return oldItem;
+  });
+  setFormData({ ...formData, items: updatedItems });
+  handleCalculateTotal();
+    
   };
 
   const editField = (name, value) => {
@@ -306,6 +333,7 @@ const InvoiceForm = () => {
             </Row>
             <InvoiceItem
               onItemizedItemEdit={onItemizedItemEdit}
+              editField={editField}
               onRowAdd={handleAddEvent}
               onRowDel={handleRowDel}
               currency={formData.currency}
